@@ -1,6 +1,8 @@
+import CTASection from "@/components/home/CTASection";
 import DemoSection from "@/components/home/demo-section";
 import HeroSection from "@/components/home/Herosection";
 import HowItWorksSection from "@/components/home/HowItWorks";
+import PricingSection from "@/components/home/PricingSection";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -10,6 +12,8 @@ export default function Home() {
       <HeroSection />
       <DemoSection />
       <HowItWorksSection />
+      <PricingSection />
+      <CTASection />
     </div>
   );
 }
