@@ -2,6 +2,7 @@
 import { file } from "zod/v4";
 import UploadFormInput from "./UploadFormInput";
 import { z } from "zod";
+import { useUploadThing } from "@/utils/uploadthing";
 const schema = z.object({
   file: z
     .instanceof(File, { message: "Invalid File" })
@@ -15,7 +16,18 @@ const schema = z.object({
     ),
 });
 export default function UploadForm() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const { startUpload, routeConfig } = useUploadThing("pdfUploader", {
+    onClientUploadComplete: () => {
+      console.log("Uploaded Successfully");
+    },
+    onUploadError: (err) => {
+      console.error("Error occured while uploading");
+    },
+    onUploadBegin: ({ file }) => {
+      console.log("Upload had begun for", file);
+    },
+  });
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Submitted");
     const formData = new FormData(e.currentTarget);
@@ -28,13 +40,12 @@ export default function UploadForm() {
       );
       return;
     }
+    const resp = await startUpload([file]);
+    if (!resp) {
+      return;
+    }
+
     console.log(validatedFields);
-    //Schema with Zod
-    //Upload the file to uploadthing
-    //parse the pdf using langchain
-    //summarize the pdf using AI LLMs
-    //save the summary to the database
-    //redirect to the [id] summary page - specific to user.
   };
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">
