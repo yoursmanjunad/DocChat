@@ -23,6 +23,7 @@ export const ourFileRouter = {
       // Don't return anything - just log or process the data
       console.log(`File uploaded for user: ${metadata.userId}`);
       console.log(`File URL: ${file.url}`);
+      return { userId: metadata.userId, file };
     }),
 } satisfies FileRouter;
 
