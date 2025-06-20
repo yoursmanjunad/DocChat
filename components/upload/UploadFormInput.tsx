@@ -13,10 +13,11 @@ export default function UploadFormInput({ onSubmit }: UploadFormInputProps) {
           type="file"
           name="file"
           accept="application/pdf"
+          required
           className=""
         />
+        <Button>Upload your PDF</Button>
       </div>
-      <Button>Upload your PDF</Button>
     </form>
   );
 }
