@@ -19,7 +19,7 @@ export default function UploadHeader() {
       </h1>
 
       <p className="text-gray-600 max-w-md text-base sm:text-lg">
-        Upload your PDF and let our AI do the magic — fast, accurate, and
+        Upload your PDF and let our AI do the magic fast, accurate, and
         effortless!
       </p>
     </div>
