@@ -2,6 +2,7 @@
 
 import { FileText } from "lucide-react";
 import NavLink from "../ui/nav-link";
+import Link from "next/link";
 import {
   SignedIn,
   SignedOut,
@@ -12,9 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
-  // TODO: Replace this with real authentication logic
-  const isLoggedIn = false; // Example: useAuth() from Clerk or context
-
   return (
     <nav className="container mx-auto flex items-center justify-between px-4 lg:px-8 py-4 border-b bg-white">
       {/* Left: Logo */}
@@ -32,26 +30,34 @@ export default function Header() {
           Pricing
         </NavLink>
 
-        {isLoggedIn && (
-          <>
-            <NavLink
-              href="/summaries"
-              className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition"
-            >
-              Your Summaries
-            </NavLink>
-            <NavLink
-              href="/upload"
-              className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition"
-            >
-              Upload PDF
-            </NavLink>
-          </>
-        )}
+        <SignedIn>
+          <NavLink
+            href="/summaries"
+            className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition"
+          >
+            Your Summaries
+          </NavLink>
+          <NavLink
+            href="/upload"
+            className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition"
+          >
+            Upload PDF
+          </NavLink>
+        </SignedIn>
       </div>
 
-      {/* Right: Auth Links */}
+      {/* Right: Auth & Upload Button */}
       <div className="flex items-center gap-3">
+        {/* Upload PDF button (only when signed in) */}
+        <SignedIn>
+          {/* <Link href="/upload">
+            <Button variant="secondary" size="sm">
+              Upload PDF
+            </Button>
+          </Link> */}
+          <UserButton afterSignOutUrl="/" />
+        </SignedIn>
+
         <SignedOut>
           <SignInButton mode="modal">
             <Button variant="outline" size="sm">
@@ -62,10 +68,6 @@ export default function Header() {
             <Button size="sm">Get Started</Button>
           </SignUpButton>
         </SignedOut>
-
-        <SignedIn>
-          <UserButton afterSignOutUrl="/" />
-        </SignedIn>
       </div>
     </nav>
   );

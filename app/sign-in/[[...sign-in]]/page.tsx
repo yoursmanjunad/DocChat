@@ -12,7 +12,6 @@ export default function Page() {
           Sign in to access your summaries and continue where you left off.
         </p>
       </div>
-
       {/* Clerk sign-up component */}
       <SignIn appearance={{ elements: { card: "shadow-xl rounded-xl" } }} />
     </div>
