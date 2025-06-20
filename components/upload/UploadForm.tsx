@@ -73,7 +73,9 @@ export default function UploadForm() {
       if (data) {
         toast.success("📝 Summary created and PDF saved!");
         formRef.current?.reset();
-
+        if (data.summary) {
+          //save the summary to the database.
+        }
         // Optionally: save to DB here
       }
     } catch (error) {
