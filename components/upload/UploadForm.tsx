@@ -4,8 +4,12 @@ import { useUploadThing } from "@/utils/uploadthing";
 import UploadFormInput from "./UploadFormInput";
 import { z } from "zod";
 import { toast } from "sonner";
-import { generatePdfSummary } from "@/actions/upload-actions";
+import {
+  generatePdfSummary,
+  storePdfSummaryAction,
+} from "@/actions/upload-actions";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const schema = z.object({
   file: z
@@ -21,6 +25,7 @@ const schema = z.object({
 export default function UploadForm() {
   const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
 
   const { startUpload } = useUploadThing("pdfUploader", {
     onClientUploadComplete: () => {
@@ -71,10 +76,20 @@ export default function UploadForm() {
       const { data = null } = summary || {};
 
       if (data) {
+        let storeResult: any;
         toast.success("📝 Summary created and PDF saved!");
-        formRef.current?.reset();
         if (data.summary) {
+          storeResult = await storePdfSummaryAction({
+            summary: data.summary,
+            fileUrl: response[0].serverData.file.url,
+            title: data.title,
+            fileName: file.name,
+          });
           //save the summary to the database.
+          toast.success("Summary Generated !");
+          formRef.current?.reset();
+          //redirect to the [id] summary page.
+          router.push(`/summaries/${storeResult.id}`);
         }
         // Optionally: save to DB here
       }
