@@ -111,7 +111,7 @@ async function savePdfSummary({
   try {
     const sql = await getDbConnection();
 
-    const result = await sql`
+    const [savedSummary] = await sql`
       INSERT INTO pdf_summaries (
         user_id,
         original_file_url,
@@ -124,16 +124,59 @@ async function savePdfSummary({
         ${summary},
         ${title},
         ${fileName}
-      )
-      RETURNING id;
-    `;
-
-    return result?.[0]?.id ?? null;
+      ) RETURNING id, summary_text`;
+    return savedSummary;
   } catch (error) {
     console.error("Error saving PDF summary:", error);
     return null;
   }
 }
+
+// export async function storePdfSummaryAction({
+//   fileUrl,
+//   summary,
+//   title,
+//   fileName,
+// }: PdfSummaryType) {
+//   try {
+//     const { userId } = await auth();
+
+//     if (!userId) {
+//       return {
+//         success: false,
+//         message: "User not authenticated",
+//       };
+//     }
+
+//     const savedSummary = await savePdfSummary({
+//       userId,
+//       fileUrl,
+//       summary,
+//       title,
+//       fileName,
+//     });
+
+//     if (!savedSummary) {
+//       return {
+//         success: false,
+//         message: "Failed to save PDF summary",
+//       };
+//     }
+
+//     revalidatePath(`/summaries/${savedSummary.id}`);
+
+//     return {
+//       success: true,
+//       message: "PDF Summary saved successfully!",
+//     };
+//   } catch (error) {
+//     return {
+//       success: false,
+//       message:
+//         error instanceof Error ? error.message : "Unknown error occurred",
+//     };
+//   }
+// }
 
 export async function storePdfSummaryAction({
   fileUrl,
@@ -148,10 +191,11 @@ export async function storePdfSummaryAction({
       return {
         success: false,
         message: "User not authenticated",
+        data: null,
       };
     }
 
-    const savedSummaryId = await savePdfSummary({
+    const savedSummary = await savePdfSummary({
       userId,
       fileUrl,
       summary,
@@ -159,24 +203,27 @@ export async function storePdfSummaryAction({
       fileName,
     });
 
-    if (!savedSummaryId) {
+    if (!savedSummary) {
       return {
         success: false,
         message: "Failed to save PDF summary",
+        data: null,
       };
     }
 
-    revalidatePath(`/summaries/${savedSummaryId}`);
+    revalidatePath(`/summaries/${savedSummary.id}`);
 
     return {
       success: true,
       message: "PDF Summary saved successfully!",
+      data: savedSummary, // This was missing!
     };
   } catch (error) {
     return {
       success: false,
       message:
         error instanceof Error ? error.message : "Unknown error occurred",
+      data: null,
     };
   }
 }

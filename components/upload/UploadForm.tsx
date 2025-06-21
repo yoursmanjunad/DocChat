@@ -89,7 +89,7 @@ export default function UploadForm() {
           toast.success("Summary Generated !");
           formRef.current?.reset();
           //redirect to the [id] summary page.
-          router.push(`/summaries/${storeResult.id}`);
+          router.push(`/summaries/${storeResult.data.id}`);
         }
         // Optionally: save to DB here
       }

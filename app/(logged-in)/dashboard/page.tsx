@@ -1,19 +1,20 @@
 import SummaryCard from "@/components/summaries/summary-card";
 import { Button } from "@/components/ui/button";
+import { getSummaries } from "@/lib/summaries";
+import { currentUser } from "@clerk/nextjs/server";
 import { Plus } from "lucide-react";
+import { redirect } from "next/navigation";
 import Link from "next/link";
+import Emptyupload from "@/components/upload/Emptyupload";
 
-export default function Dashboard() {
+export default async function Dashboard() {
   const uploadLimit = 5;
-  const summaries = [
-    {
-      id: 1,
-      title: "PDF File Lovdey",
-      createdAt: "2025-06-21 12:20:50.159856+00",
-      summary_text: "Description",
-      status: "completed",
-    },
-  ];
+  const user = await currentUser();
+  const userId = user?.id;
+  if (!userId) {
+    return redirect("/sign-in");
+  }
+  const summaries = await getSummaries(userId);
   return (
     <main className="min-h-screen bg-gray-50/50 dark:bg-gray-900/50">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -47,11 +48,15 @@ export default function Dashboard() {
             Upgrade Plan →
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg_grid-cols-3 sm:px-0">
-          {summaries.map((summary, index) => (
-            <SummaryCard key={index} summary={summary} />
-          ))}
-        </div>
+        {summaries.length === 0 ? (
+          <Emptyupload />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg_grid-cols-3 sm:px-0">
+            {summaries.map((summary, index) => (
+              <SummaryCard key={index} summary={summary} />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

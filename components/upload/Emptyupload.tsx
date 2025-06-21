@@ -2,7 +2,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 
-export default function Eptyupload() {
+export default function Emptyupload() {
   return (
     <div className="border border-gray-200/60 dark:border-gray-800/60 rounded-xl bg-white/60 dark:bg-gray-950/60 backdrop-blur-sm">
       <div className="p-8">
