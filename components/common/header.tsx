@@ -32,7 +32,7 @@ export default function Header() {
 
         <SignedIn>
           <NavLink
-            href="/summaries"
+            href="/dashboard"
             className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition"
           >
             Your Summaries
