@@ -57,7 +57,7 @@ export async function generatePdfSummary(
     let summary: string | null = null;
 
     try {
-      summary = await generateSummaryFromGemini(pdfText);
+      summary = await generateSummaryFromOpenAI(pdfText);
     } catch (error) {
       console.log("OpenAI error:", error);
       if (error instanceof Error && error.message === "RATE_LIMIT_EXCEEDED") {
@@ -107,7 +107,7 @@ async function savePdfSummary({
   summary,
   title,
   fileName,
-}: PdfSummaryType): Promise<string | null> {
+}: PdfSummaryType): Promise<{ id: string; summary_text: string } | null> {
   try {
     const sql = await getDbConnection();
 
@@ -125,58 +125,13 @@ async function savePdfSummary({
         ${title},
         ${fileName}
       ) RETURNING id, summary_text`;
+
     return savedSummary;
   } catch (error) {
     console.error("Error saving PDF summary:", error);
     return null;
   }
 }
-
-// export async function storePdfSummaryAction({
-//   fileUrl,
-//   summary,
-//   title,
-//   fileName,
-// }: PdfSummaryType) {
-//   try {
-//     const { userId } = await auth();
-
-//     if (!userId) {
-//       return {
-//         success: false,
-//         message: "User not authenticated",
-//       };
-//     }
-
-//     const savedSummary = await savePdfSummary({
-//       userId,
-//       fileUrl,
-//       summary,
-//       title,
-//       fileName,
-//     });
-
-//     if (!savedSummary) {
-//       return {
-//         success: false,
-//         message: "Failed to save PDF summary",
-//       };
-//     }
-
-//     revalidatePath(`/summaries/${savedSummary.id}`);
-
-//     return {
-//       success: true,
-//       message: "PDF Summary saved successfully!",
-//     };
-//   } catch (error) {
-//     return {
-//       success: false,
-//       message:
-//         error instanceof Error ? error.message : "Unknown error occurred",
-//     };
-//   }
-// }
 
 export async function storePdfSummaryAction({
   fileUrl,
@@ -216,7 +171,7 @@ export async function storePdfSummaryAction({
     return {
       success: true,
       message: "PDF Summary saved successfully!",
-      data: savedSummary, // This was missing!
+      data: savedSummary,
     };
   } catch (error) {
     return {
