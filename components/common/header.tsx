@@ -55,7 +55,7 @@ export default function Header() {
               Upload PDF
             </Button>
           </Link> */}
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </SignedIn>
 
         <SignedOut>

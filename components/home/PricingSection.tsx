@@ -1,31 +1,20 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Pricingplans } from "@/utils/constants";
 
-const plans = [
-  {
-    id: "basic",
-    title: "Basic",
-    price: 9,
-    list: ["5 summaries per month", "Best for occassional use"],
-  },
-  {
-    id: "pro",
-    title: "Pro",
-    price: 29,
-    list: ["Unlimited summaries", "Priority processing", "Email support"],
-    highlight: true, // special property to identify highlight
-  },
-];
+// Update your actual Stripe Checkout URLs here
 
 function PricingCard({
   title,
   price,
   list,
+  checkoutUrl,
   highlight = false,
 }: {
   title: string;
   price: number;
   list: string[];
+  checkoutUrl: string;
   highlight?: boolean;
 }) {
   return (
@@ -50,13 +39,17 @@ function PricingCard({
           ))}
         </ul>
       </div>
-      <Button
-        className={`w-full ${
-          highlight ? "bg-indigo-600 hover:bg-indigo-700" : ""
-        }`}
-      >
-        Choose {title}
-      </Button>
+
+      {/* Button wrapped in <a> to redirect to Stripe checkout */}
+      <a href={checkoutUrl} target="_blank" rel="noopener noreferrer">
+        <Button
+          className={`w-full ${
+            highlight ? "bg-indigo-600 hover:bg-indigo-700 text-white" : ""
+          }`}
+        >
+          Choose {title}
+        </Button>
+      </a>
     </div>
   );
 }
@@ -72,8 +65,8 @@ export default function PricingSection() {
           </p>
         </div>
         <div className="relative flex justify-center flex-col lg:flex-row items-center lg:items-stretch gap-8">
-          {plans.map((plan) => (
-            <PricingCard key={plan.id} {...plan} highlight={plan.highlight} />
+          {Pricingplans.map((plan) => (
+            <PricingCard key={plan.id} {...plan} />
           ))}
         </div>
       </div>
