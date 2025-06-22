@@ -81,7 +81,6 @@ export async function createOrUpdateUser({
   }
 }
 
-// 🧾 Insert Payment Record
 async function createPayment({
   session,
   priceId,
@@ -103,5 +102,87 @@ async function createPayment({
     console.log(`💸 Payment recorded: ${id}`);
   } catch (error) {
     console.error("❌ Error creating payment:", error);
+  }
+}
+
+// export async function handleSubscriptionDeleted({
+//   subscriptionId,
+//   stripe,
+// }: {
+//   subscriptionId: string;
+//   stripe: Stripe;
+// }) {
+//   console.log("⚠️ Subscription Deleted:", subscriptionId);
+
+//   try {
+//     // Retrieve subscription details
+//     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+//     const customerId = subscription.customer as string;
+
+//     // Retrieve customer details
+//     const customer = await stripe.customers.retrieve(customerId);
+//     const email = "email" in customer ? customer.email : null;
+
+//     const sql = await getDbConnection();
+
+//     // First try to update by email if present
+//     if (email) {
+//       await sql`
+//         UPDATE users
+//         SET status = 'canceled'
+//         WHERE email = ${email}
+//       `;
+//       console.log(`🛑 Subscription canceled for ${email}`);
+//     } else {
+//       // Fallback: update by customer_id
+//       await sql`
+//         UPDATE users
+//         SET status = 'canceled'
+//         WHERE customer_id = ${customerId}
+//       `;
+//       console.log(`🛑 Subscription canceled for customer_id: ${customerId}`);
+//     }
+//   } catch (error) {
+//     console.error("❌ Error handling subscription deleted:", error);
+//   }
+// }
+
+export async function handleSubscriptionDeleted({
+  subscriptionId,
+  stripe,
+}: {
+  subscriptionId: string;
+  stripe: Stripe;
+}) {
+  console.log("⚠️ Subscription Deleted:", subscriptionId);
+
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const customerId = subscription.customer as string;
+
+    const sql = await getDbConnection();
+
+    // Find the user using customerId from your own DB
+    const user = await sql`
+      SELECT email FROM users WHERE customer_id = ${customerId}
+    `;
+
+    if (!user || user.length === 0) {
+      console.warn("⚠️ No user found with customer_id:", customerId);
+      return;
+    }
+
+    const email = user[0].email;
+
+    // Update user’s status to 'canceled'
+    await sql`
+      UPDATE users
+      SET status = 'canceled'
+      WHERE email = ${email}
+    `;
+
+    console.log(`🛑 Subscription canceled — user status updated for ${email}`);
+  } catch (error) {
+    console.error("❌ Error handling subscription deleted:", error);
   }
 }

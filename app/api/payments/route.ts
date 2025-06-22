@@ -1,4 +1,6 @@
-import handleCheckoutSessionCompleted from "@/lib/payments";
+import handleCheckoutSessionCompleted, {
+  handleSubscriptionDeleted,
+} from "@/lib/payments";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -30,7 +32,6 @@ export async function POST(req: NextRequest) {
       case "checkout.session.completed": {
         const sessionId = (event.data.object as Stripe.Checkout.Session).id;
 
-        // Expand line items (note: fixed typo 'line_iems' → 'line_items')
         const session = await stripe.checkout.sessions.retrieve(sessionId, {
           expand: ["line_items"],
         });
@@ -41,7 +42,10 @@ export async function POST(req: NextRequest) {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
-        console.log("⚠️ Subscription canceled:", subscription);
+        await handleSubscriptionDeleted({
+          subscriptionId: subscription.id,
+          stripe,
+        });
         break;
       }
 
